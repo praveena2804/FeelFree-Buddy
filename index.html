@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FeelFree Buddy</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      background: linear-gradient(to right, #e0f7fa, #fce4ec);
+    }
+    .chat {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .question {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .option {
+      display: block;
+      padding: 12px;
+      margin: 10px auto;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      max-width: 300px;
+      transition: background 0.3s ease;
+    }
+    .hug-img {
+      width: 150px;
+      margin-top: 15px;
+      border-radius: 12px;
+    }
+    #inputArea {
+      margin-top: 15px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #submitBtn {
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffd54f;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat">
+  <div id="question" class="question"></div>
+  <div id="options"></div>
+  <div id="image"></div>
+  <div id="inputArea"></div>
+</div>
+
+<script>
+  const motivationQuotes = [
+    "You are capable of amazing things!",
+    "Difficult roads often lead to beautiful destinations.",
+    "Storms don’t last forever.",
+    "Small steps every day lead to big results.",
+    "The best view comes after the hardest climb."
+  ];
+
+  const movieSuggestions = [
+    "Vikram (2022)",
+    "Super Deluxe",
+    "Jigarthanda",
+    "Ratsasan",
+    "Kaithi",
+    "Thiruchitrambalam",
+    "96",
+    "Asuran",
+    "Soodhu Kavvum",
+    "Petta"
+  ];
+
+  const happyReplies = [
+    "Wow! Super! 😍",
+    "Yay! So happy for you! 🎉",
+    "That's amazing! 💫",
+    "Awesome news! 🤩",
+    "Lovely to hear that! 🥰"
+  ];
+
+  const colors = ["#ffecb3", "#dcedc8", "#ffcdd2", "#b3e5fc", "#e1bee7", "#f8bbd0", "#c8e6c9"];
+
+  function getRandomItem(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  const flow = {
+    start: {
+      question: "Hey! How are you feeling right now?",
+      options: {
+        "Cheerful 😊": "happyShare",
+        "Down 😔": "sadResponse",
+        "Stressed 😣": "anxiousResponse",
+        "Bored 😑": "boredResponse",
+        "Need Motivation 💪": "motivationResponse"
+      }
+    },
+    sadResponse: {
+      question: "I'm here for you. Would a small breathing exercise help?",
+      options: {
+        "Yes 🧘‍♀️": "breathing",
+        "No, need a hug 🤗": "wantHug"
+      }
+    },
+    anxiousResponse: {
+      question: "Let’s calm down together. Want a relaxation tip?",
+      options: {
+        "Yes please 😊": "tip",
+        "No thanks": "end"
+      }
+    },
+    breathing: {
+      question: "Breathe in... Hold... Breathe out... Repeat this 3 times. Feeling better?",
+      options: {
+        "Yes, thanks! 😊": "end",
+        "Still need help 💭": "tip"
+      }
+    },
+    wantHug: {
+      question: "Here’s a virtual hug just for you!",
+      image: "https://i.imgur.com/ntqYLGl.png",
+      options: {
+        "Thank you! 🤍": "end",
+        "Restart 🔁": "start"
+      }
+    },
+    tip: {
+      question: "Try this: Name 5 foods you can eat, 4 drinks you can drink, 3 things you can see, 2 places you can go and 1 thing you can't live without (5-4-3-2-1 Technique).",
+      options: {
+        "Got it! 👍": "end",
+        "Start Over 🔄": "start"
+      }
+    },
+    end: {
+      question: "Thanks for chatting with me! Come back anytime, okay? 💛",
+      options: {
+        "Restart 🔁": "start"
+      }
+    }
+  };
+
+  function render(step) {
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("image").innerHTML = "";
+    document.getElementById("inputArea").innerHTML = "";
+
+    if (step === "motivationResponse") {
+      document.getElementById("question").innerText = getRandomItem(motivationQuotes);
+      addOption("More Motivation 💥", "motivationResponse");
+      addOption("Restart 🔁", "start");
+      return;
+    }
+
+    if (step === "boredResponse") {
+      document.getElementById("question").innerText = "Try watching this Tamil movie: " + getRandomItem(movieSuggestions);
+      addOption("Another Suggestion 🎬", "boredResponse");
+      addOption("Restart 🔁", "start");
+      return;
+    }
+
+    if (step === "happyShare") {
+      document.getElementById("question").innerText = "Aww, want to share the happy news with me?";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Type your happy news here...";
+      input.id = "happyInput";
+
+      const btn = document.createElement("button");
+      btn.innerText = "Share 💬";
+      btn.id = "submitBtn";
+      btn.onclick = () => {
+        const reply = getRandomItem(happyReplies);
+        document.getElementById("question").innerText = reply;
+        document.getElementById("inputArea").innerHTML = "";
+        addOption("Restart 🔁", "start");
+      };
+
+      document.getElementById("inputArea").appendChild(input);
+      document.getElementById("inputArea").appendChild(btn);
+      return;
+    }
+
+    const data = flow[step];
+    document.getElementById("question").innerText = data.question;
+
+    if (data.image) {
+      const img = document.createElement("img");
+      img.src = data.image;
+      img.className = "hug-img";
+      document.getElementById("image").appendChild(img);
+    }
+
+    let i = 0;
+    for (let [text, next] of Object.entries(data.options)) {
+      addOption(text, next, i++);
+    }
+  }
+
+  function addOption(text, next, colorIndex = 0) {
+    const btn = document.createElement("button");
+    btn.innerText = text;
+    btn.className = "option";
+    btn.style.background = colors[colorIndex % colors.length];
+    btn.onclick = () => render(next);
+    document.getElementById("options").appendChild(btn);
+  }
+
+  render("start");
+</script>
+
+</body>
+</html>
